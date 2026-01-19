@@ -3,4 +3,40 @@ name: ML Pipeline
 on:
   push:
     branches: [ main ]
+  pull_request:
 
+jobs:
+  ml-pipeline:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Set up Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.10"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          pip install -r requirements-dev.txt
+
+      - name: Unit tests
+        run: pytest -m unit
+
+      - name: Training
+        run: make train
+
+      - name: Evaluation
+        run: make evaluate
+
+      - name: Integration tests
+        run: pytest -m integration
+
+      - name: Quality gate
+        run: make gate
+
+      - name: Package model
+        run: make package

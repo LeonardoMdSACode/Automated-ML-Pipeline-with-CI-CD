@@ -1,0 +1,1 @@
+'''New model version increments correctly'''

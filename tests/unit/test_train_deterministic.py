@@ -1,0 +1,1 @@
+'''Fixed seed → identical model hash / coefficients'''

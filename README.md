@@ -59,9 +59,9 @@ Automated ML Pipeline with CI-CD/
 │   └── package_model.py              # Registry promotion
 │
 ├── tests/
-│   ├── test_data_validation.py
-│   ├── test_training_reproducible.py
-│   └── test_metrics_thresholds.py
+│   ├── integration
+│   └── unit
+│   
 │
 ├── dvc.yaml                          # Pipeline stages (train/eval)
 ├── .dvc/
