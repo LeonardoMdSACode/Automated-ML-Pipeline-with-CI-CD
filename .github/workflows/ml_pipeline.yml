@@ -1,0 +1,6 @@
+name: ML Pipeline
+
+on:
+  push:
+    branches: [ main ]
+
