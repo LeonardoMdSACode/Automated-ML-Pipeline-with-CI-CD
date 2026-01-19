@@ -13,72 +13,70 @@ license: mit
 
 # Notes
 
+Raw dataset: https://www.kaggle.com/datasets/harlfoxem/housesalesprediction
+
+py -3.10 -m venv .venv
+
+.\.venv\Scripts\activate
+
+python -m pip install --upgrade pip
+
+pip install -r requirements-dev.txt
+
 # Repo Structure (Present)
 
 ```text
-Automated ML Pipeline with CI-CD/
-├── .github/
-│   └── workflows/
-│       └── ml_pipeline.yml          # CI: train → evaluate → gate → package
-│
-├── app/
-│   ├── main.py                      # FastAPI entrypoint (HF Spaces)
-│   ├── api/
-│   │   └── routes.py                # /predict, /health
-│   ├── inference/
-│   │   └── predictor.py             # Loads latest approved model
-│   ├── schemas/
-│   │   └── request_response.py
-│   └── core/
-│       ├── config.py                # Paths, env flags
-│       └── logging.py
-│
-├── data/
-│   ├── raw/                          # DVC-tracked
-│   ├── processed/                   # DVC-tracked
-│   └── reference/                   # Baseline dataset (for regression tests)
-│
-├── models/
-│   ├── registry/
-│   │   ├── model_v001/
-│   │   │   ├── model.pkl
-│   │   │   └── metadata.json        # metrics, git_sha, data_hash
-│   │   ├── model_v002/
-│   │   └── latest -> model_v002     # symlink or pointer file
-│   └── baseline/
-│       └── metrics.json             # Last approved metrics
-│
-├── reports/
-│   ├── evaluation.json               # CI output
-│   └── comparison.json               # baseline vs candidate
-│
-├── scripts/
-│   ├── train.py                      # Deterministic training
-│   ├── evaluate.py                   # Metrics computation
-│   ├── compare.py                    # Quality gate (FAILS CI)
-│   └── package_model.py              # Registry promotion
-│
-├── tests/
-│   ├── integration
-│   └── unit
-│   
-│
-├── dvc.yaml                          # Pipeline stages (train/eval)
-├── .dvc/
-├── .dvcignore
-│
+Automated-ML-Pipeline-with-CI-CD/
+├── Dockerfile
 ├── Makefile
-│   ├── train
-│   ├── evaluate
-│   ├── gate
-│   ├── package
-│   └── serve
-│
+├── README.md
+├── LICENSE
+├── dvc.yaml
+├── pytest.ini
 ├── requirements.txt
 ├── requirements-dev.txt
-├── pytest.ini
-│
-├── Dockerfile                        # HF Spaces compatible
-├── README.md
-└── LICENSE
+├── app/
+│   ├── main.py
+│   ├── api/
+│   │   └── routes.py
+│   ├── core/
+│   │   ├── config.py
+│   │   └── logging.py
+│   ├── inference/
+│   │   └── predictor.py
+│   └── schemas/
+│       └── request_response.py
+├── data/
+│   ├── raw/
+│   ├── processed/
+│   └── reference/
+├── models/
+│   ├── baseline/
+│   │   └── metrics.json
+│   └── registry/
+│       ├── model_v001/
+│       └── model_v002/
+├── reports/
+│   ├── evaluation.json
+│   └── comparison.json
+├── scripts/
+│   ├── train.py
+│   ├── evaluate.py
+│   ├── compare.py
+│   └── package_model.py
+└── tests/
+    ├── unit/
+    │   ├── test_data_schema.py
+    │   ├── test_feature_extraction.py
+    │   ├── test_metric_gate.py
+    │   ├── test_metrics_computation.py
+    │   ├── test_registry_metadata.py
+    │   ├── test_train_deterministic.py
+    │   ├── test_train_outputs.py
+    │   └── test_version_increment.py
+    └── integration/
+        ├── test_ci_like_flow.py
+        ├── test_gate_blocks_regression.py
+        ├── test_model_promotion.py
+        └── test_train_evaluate_pipeline.py
 ```

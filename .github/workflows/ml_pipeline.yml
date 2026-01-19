@@ -20,23 +20,28 @@ jobs:
 
       - name: Install dependencies
         run: |
+          python -m pip install --upgrade pip
           pip install -r requirements.txt
           pip install -r requirements-dev.txt
+          pip install dvc
 
-      - name: Unit tests
-        run: pytest -m unit
+      - name: Pull DVC data
+        run: dvc pull
+
+      - name: Run unit tests
+        run: python -m pytest -m unit
 
       - name: Training
-        run: make train
+        run: python scripts/train.py
 
       - name: Evaluation
-        run: make evaluate
+        run: python scripts/evaluate.py
 
-      - name: Integration tests
-        run: pytest -m integration
+      - name: Run integration tests
+        run: python -m pytest -m integration
 
       - name: Quality gate
-        run: make gate
+        run: python scripts/compare.py
 
       - name: Package model
-        run: make package
+        run: python scripts/package_model.py
