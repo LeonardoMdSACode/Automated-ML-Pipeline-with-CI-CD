@@ -1,0 +1,35 @@
+# Python caches
+__pycache__/
+*.pyc
+*.pyo
+*.pyd
+
+# Virtual environments
+.venv/
+venv/
+env/
+
+# Git / CI
+.git/
+.github/
+
+# Tests
+tests/
+
+# Build / tooling
+.build/
+dist/
+*.egg-info/
+
+# Logs & temp
+logs/
+tmp/
+*.log
+
+# IDE
+.vscode/
+.idea/
+
+# OS
+.DS_Store
+Thumbs.db
