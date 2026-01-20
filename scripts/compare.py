@@ -1,42 +1,35 @@
 #! python3
-# scripts\compare.py
-# Quality gate (FAILS CI)
+# scripts/compare.py
+# Compare latest evaluation to baseline
 
 import json
 from pathlib import Path
-import sys
 
-# Paths
-EVAL_PATH = Path("reports/evaluation.json")
-BASELINE_PATH = Path("models/baseline/metrics.json")
-GATE_PATH = Path("reports/comparison.json")
-GATE_PATH.parent.mkdir(exist_ok=True, parents=True)
+BASELINE_METRICS = Path("models/baseline/metrics.json")
+EVAL_DIR = Path("reports/evaluations")
 
-# Load metrics
-with open(EVAL_PATH) as f:
-    current = json.load(f)
-
-with open(BASELINE_PATH) as f:
+# Load baseline metrics
+with open(BASELINE_METRICS) as f:
     baseline = json.load(f)
 
-# Quality gate: fail if RMSE increases
-rmse_diff = current["rmse"] - baseline["rmse"]
-passed = current["rmse"] <= baseline["rmse"]
+# Load latest evaluation (by version)
+latest_version = max(EVAL_DIR.glob("*.json"), key=lambda x: x.stem)
+with open(latest_version) as f:
+    latest = json.load(f)
 
-# Save comparison
-comparison = {
-    "current_rmse": current["rmse"],
-    "baseline_rmse": baseline["rmse"],
-    "rmse_diff": rmse_diff,
-    "passed_gate": passed,
-    "model_version": current["model_version"]
-}
+print(f"Comparing latest ({latest['model_version']}) vs baseline ({baseline['model_version']})")
 
-with open(GATE_PATH, "w") as f:
-    json.dump(comparison, f)
+# Define quality gate rules
+def gate_passed(latest_metrics, baseline_metrics):
+    # Fail if RMSE increased or R² decreased
+    if latest_metrics["rmse"] > baseline_metrics["rmse"]:
+        return False
+    if latest_metrics["r2"] < baseline_metrics["r2"]:
+        return False
+    return True
 
-if not passed:
-    print("QUALITY GATE FAILED: RMSE increased")
-    sys.exit(1)
-
-print("QUALITY GATE PASSED")
+if gate_passed(latest, baseline):
+    print("QUALITY GATE PASSED")
+else:
+    print("QUALITY GATE FAILED")
+    exit(1)
