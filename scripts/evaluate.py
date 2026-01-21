@@ -7,6 +7,7 @@ import joblib
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
 import json
 from pathlib import Path
+import time
 
 # Paths
 PROCESSED_DATA = Path("data/processed/train_test.npz")
@@ -35,14 +36,18 @@ rmse = mean_squared_error(y_test, y_pred, squared=False)
 mae = mean_absolute_error(y_test, y_pred)
 r2 = r2_score(y_test, y_pred)
 
-# Save evaluation per model version
-eval_file = EVAL_DIR / f"{latest_version}.json"
+# --- Deterministic filename ---
+# Use version + microsecond timestamp to avoid collisions in unit tests
+timestamp = int(time.time() * 1_000_000)
+eval_file = EVAL_DIR / f"{latest_version}_run{timestamp}.json"
+
 evaluation = {
     "rmse": float(rmse),
     "mae": float(mae),
     "r2": float(r2),
     "model_version": latest_version
 }
+
 with open(eval_file, "w") as f:
     json.dump(evaluation, f, indent=2)
 

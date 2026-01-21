@@ -9,6 +9,12 @@ from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
 from pathlib import Path
 import json
+import random
+
+
+SEED = 42
+random.seed(SEED)
+np.random.seed(SEED)
 
 # Paths
 RAW_DATA = Path("data/raw/kc_house_data.csv")
@@ -36,15 +42,15 @@ y = df["price"]
 
 # Split data deterministically
 X_train, X_test, y_train, y_test = train_test_split(
-    X, y, test_size=0.2, random_state=42
+    X, y, test_size=0.2, random_state=SEED
 )
 
 # Train model
 model = RandomForestRegressor(
     n_estimators=100,
     max_depth=10,
-    random_state=42,
-    n_jobs=-1
+    n_jobs=-1,
+    random_state=SEED
 )
 model.fit(X_train, y_train)
 
