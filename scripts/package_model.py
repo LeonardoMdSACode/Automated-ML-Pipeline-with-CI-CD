@@ -45,11 +45,16 @@ if not gate_passed(best_metrics, baseline):
 print(f"Best model selected: {best_model_version} with RMSE={best_metrics['rmse']} and R2={best_metrics['r2']}")
 
 # Step 3: Copy model.pkl
-src_model = REGISTRY / best_model_version / "model.pkl"
+# Extract version prefix from evaluation file stem
+# e.g., "model_v001_run1769000855374891" -> "model_v001"
+model_folder = best_model_file.stem.split("_run")[0]
+src_model = REGISTRY / model_folder / "model.pkl"
+
 if not src_model.exists():
     raise FileNotFoundError(f"Model file not found: {src_model}")
 
 shutil.copy(src_model, PACKAGE_DIR / "model.pkl")
+
 
 # Step 4: Copy metrics
 shutil.copy(best_model_file, PACKAGE_DIR / "metrics.json")
