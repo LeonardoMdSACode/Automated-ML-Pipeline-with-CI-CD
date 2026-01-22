@@ -1,30 +1,29 @@
 #! python3
 # scripts/train.py
-# Deterministic training
+# Deterministic training with immediate evaluation and latest.json update
 
 import sys
 from pathlib import Path
-
-ROOT = Path(__file__).resolve().parents[1]
-if str(ROOT) not in sys.path:
-    sys.path.insert(0, str(ROOT))
+from datetime import datetime
+import random
+import json
+import os
 
 import pandas as pd
 import numpy as np
 import joblib
 from sklearn.model_selection import train_test_split
 from sklearn.ensemble import RandomForestRegressor
-import json
-import random
+from sklearn.metrics import r2_score, mean_absolute_error
 
-from scripts.config import (
-    SEED,
-    RAW_DATA,
-    PROCESSED_DATA,
-    REGISTRY,
-    LATEST_JSON,
-)
+# Add project root to sys.path
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
 
+from scripts.config import SEED, RAW_DATA, PROCESSED_DATA, REGISTRY, LATEST_JSON
+
+# Seed everything for deterministic behavior
 random.seed(SEED)
 np.random.seed(SEED)
 
@@ -32,10 +31,11 @@ np.random.seed(SEED)
 existing = sorted([d.name for d in REGISTRY.iterdir() if d.name.startswith("model_v")])
 if existing:
     last_version = max(int(d.split("_v")[-1]) for d in existing)
-    new_version = f"model_v{last_version+1:03d}"
+    new_version = f"model_v{last_version + 1:03d}"
 else:
     new_version = "model_v001"
 
+# Create model directory
 MODEL_DIR = REGISTRY / new_version
 MODEL_DIR.mkdir(parents=True, exist_ok=True)
 MODEL_PATH = MODEL_DIR / "model.pkl"
@@ -63,22 +63,37 @@ model.fit(X_train, y_train)
 # Save model
 joblib.dump(model, MODEL_PATH)
 
-# Save train/test data
+# Save processed train/test data
 PROCESSED_DATA.parent.mkdir(parents=True, exist_ok=True)
 np.savez(PROCESSED_DATA, X_train=X_train, X_test=X_test, y_train=y_train, y_test=y_test)
 
+# Compute metrics on test set
+y_pred = model.predict(X_test)
+metrics = {
+    "r2": r2_score(y_test, y_pred),
+    "mae": mean_absolute_error(y_test, y_pred)
+}
+
 # Save metadata
 metadata = {
+    "version": new_version,
     "n_samples": len(df),
     "n_features": X.shape[1],
     "model_type": "RandomForestRegressor",
-    "version": new_version
+    "metrics": metrics,
+    "created_at": datetime.utcnow().isoformat() + "Z"
 }
 with open(METADATA_PATH, "w") as f:
     json.dump(metadata, f, indent=2)
 
-# Update latest pointer
+# Update latest.json pointer
+latest_info = {
+    "latest_version": new_version,
+    "path": os.path.relpath(MODEL_PATH, start=ROOT),
+    "metrics": metrics,
+    "created_at": metadata["created_at"]
+}
 with open(LATEST_JSON, "w") as f:
-    json.dump({"latest_version": new_version}, f, indent=2)
+    json.dump(latest_info, f, indent=2)
 
 print(f"Training complete. Model saved to {MODEL_DIR}")

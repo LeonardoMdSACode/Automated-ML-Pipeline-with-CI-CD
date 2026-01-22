@@ -19,3 +19,5 @@ pytest==8.2.0
 
 # Optional for deterministic randomness
 setuptools==68.0.0
+
+pydantic

@@ -1,1 +1,11 @@
-{"n_samples": 21613, "n_features": 18, "model_type": "RandomForestRegressor", "version": "model_v001"}
+{
+  "version": "model_v001",
+  "n_samples": 21613,
+  "n_features": 18,
+  "model_type": "RandomForestRegressor",
+  "metrics": {
+    "r2": 0.8380594156239444,
+    "mae": 79874.49382189297
+  },
+  "created_at": "2026-01-22T15:01:37.563532Z"
+}
