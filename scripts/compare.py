@@ -12,6 +12,7 @@ import json
 import os
 
 from scripts.config import EVAL_DIR
+from scripts.config import BASELINE_METRICS
 
 eval_files = list(EVAL_DIR.glob("*.json"))
 if not eval_files:
@@ -24,10 +25,16 @@ for f in eval_files:
 
 latest = max(all_evals, key=lambda x: x["model_version"])
 
-baseline_candidates = [e for e in all_evals if e["model_version"] != latest["model_version"]]
-baseline = latest if not baseline_candidates else min(
-    baseline_candidates, key=lambda x: (x["rmse"], -x["r2"])
-)
+if BASELINE_METRICS.exists():
+    with open(BASELINE_METRICS) as f:
+        baseline = json.load(f)
+else:
+    baseline_candidates = [
+        e for e in all_evals if e["model_version"] != latest["model_version"]
+    ]
+    baseline = latest if not baseline_candidates else min(
+        baseline_candidates, key=lambda x: (x["rmse"], -x["r2"])
+    )
 
 print(f"Comparing latest ({latest['model_version']}) vs baseline ({baseline['model_version']})")
 
