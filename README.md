@@ -23,7 +23,7 @@ python -m pip install --upgrade pip
 
 pip install -r requirements-dev.txt
 
-# Repo Structure (Present)
+# Repo Structure (Initial)
 
 ```text
 Automated-ML-Pipeline-with-CI-CD/

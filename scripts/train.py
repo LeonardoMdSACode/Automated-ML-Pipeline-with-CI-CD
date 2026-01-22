@@ -1,5 +1,5 @@
 #! python3
-# scripts\train.py
+# scripts/train.py
 # Deterministic training
 
 import pandas as pd
@@ -11,16 +11,16 @@ from pathlib import Path
 import json
 import random
 
+from scripts.config import (
+    SEED,
+    RAW_DATA,
+    PROCESSED_DATA,
+    REGISTRY,
+    LATEST_JSON,
+)
 
-SEED = 42
 random.seed(SEED)
 np.random.seed(SEED)
-
-# Paths
-RAW_DATA = Path("data/raw/kc_house_data.csv")
-PROCESSED_DATA = Path("data/processed/train_test.npz")
-REGISTRY = Path("models/registry")
-REGISTRY.mkdir(parents=True, exist_ok=True)
 
 # Determine new model version
 existing = sorted([d.name for d in REGISTRY.iterdir() if d.name.startswith("model_v")])
@@ -69,11 +69,10 @@ metadata = {
     "version": new_version
 }
 with open(METADATA_PATH, "w") as f:
-    json.dump(metadata, f)
+    json.dump(metadata, f, indent=2)
 
 # Update latest pointer
-LATEST = REGISTRY / "latest.json"
-with open(LATEST, "w") as f:
-    json.dump({"latest_version": new_version}, f)
+with open(LATEST_JSON, "w") as f:
+    json.dump({"latest_version": new_version}, f, indent=2)
 
 print(f"Training complete. Model saved to {MODEL_DIR}")
