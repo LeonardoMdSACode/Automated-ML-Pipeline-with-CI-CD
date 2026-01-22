@@ -2,6 +2,13 @@
 # scripts/evaluate.py
 # Metrics computation with baseline initialization
 
+import sys
+from pathlib import Path
+
+ROOT = Path(__file__).resolve().parents[1]
+if str(ROOT) not in sys.path:
+    sys.path.insert(0, str(ROOT))
+
 import numpy as np
 import joblib
 from sklearn.metrics import mean_squared_error, mean_absolute_error, r2_score
