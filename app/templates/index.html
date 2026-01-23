@@ -1,35 +1,58 @@
 <!DOCTYPE html>
 <html>
 <head>
-  <title>ML Inference</title>
-  <link rel="stylesheet" href="/static/style.css">
+    <title>House Price Prediction</title>
+    <meta charset="utf-8">
 </head>
 <body>
-  <h1>House Price Prediction</h1>
+<h2>House Price Prediction</h2>
 
-  <form id="form">
-    <input type="text" id="features" placeholder="Comma separated features">
+<form id="predict-form">
+    <textarea id="features" rows="18" cols="50">
+{
+  "bedrooms": 3,
+  "bathrooms": 2,
+  "sqft_living": 1800,
+  "sqft_lot": 5000,
+  "floors": 1,
+  "waterfront": 0,
+  "view": 0,
+  "condition": 3,
+  "grade": 7,
+  "sqft_above": 1800,
+  "sqft_basement": 0,
+  "yr_built": 1995,
+  "yr_renovated": 0,
+  "zipcode": 98178,
+  "lat": 47.51,
+  "long": -122.25,
+  "sqft_living15": 1800,
+  "sqft_lot15": 5000
+}
+    </textarea><br><br>
+
     <button type="submit">Predict</button>
-  </form>
+</form>
 
-  <pre id="output"></pre>
+<h3>Result</h3>
+<pre id="result"></pre>
 
-  <script>
-    document.getElementById("form").onsubmit = async (e) => {
-      e.preventDefault();
-      const features = document.getElementById("features").value
-        .split(",")
-        .map(Number);
+<script>
+document.getElementById("predict-form").addEventListener("submit", async function(e) {
+    e.preventDefault();
 
-      const res = await fetch("/api/predict", {
+    const features = JSON.parse(document.getElementById("features").value);
+
+    const response = await fetch("/api/predict", {
         method: "POST",
-        headers: {"Content-Type": "application/json"},
-        body: JSON.stringify({features})
-      });
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ features })
+    });
 
-      document.getElementById("output").textContent =
-        JSON.stringify(await res.json(), null, 2);
-    };
-  </script>
+    const data = await response.json();
+    document.getElementById("result").textContent =
+        "Prediction: " + data.prediction + "\nModel: " + data.model_version;
+});
+</script>
 </body>
 </html>

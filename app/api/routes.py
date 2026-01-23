@@ -7,6 +7,7 @@ from app.inference.predictor import Predictor
 router = APIRouter()
 predictor = Predictor()
 
+
 @router.post("/predict", response_model=PredictionResponse)
 def predict_endpoint(request: PredictionRequest):
     y = predictor.predict(request.features)
