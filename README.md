@@ -17,7 +17,7 @@ Raw dataset: https://www.kaggle.com/datasets/harlfoxem/housesalesprediction
 
 py -3.10 -m venv .venv
 
-.\.venv\Scripts\activate
+.\\.venv\Scripts\activate
 
 python -m pip install --upgrade pip
 

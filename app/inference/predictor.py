@@ -1,9 +1,8 @@
-# Loads latest approved model
 # app/inference/predictor.py
 from pathlib import Path
-import joblib
 import json
-from scripts.config import REGISTRY, LATEST_JSON
+import joblib
+from app.core.config import LATEST_JSON
 
 class Predictor:
     def __init__(self):
@@ -19,9 +18,4 @@ class Predictor:
         return joblib.load(model_path)
 
     def predict(self, X):
-        """
-        X: pd.DataFrame or array-like
-        Returns: predictions as list
-        """
-        preds = self.model.predict(X)
-        return preds.tolist()
+        return self.model.predict(X).tolist()
