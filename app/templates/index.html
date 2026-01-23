@@ -1,66 +1,87 @@
 <!DOCTYPE html>
-<html>
+<html lang="en">
 <head>
-    <title>House Price Prediction</title>
-    <meta charset="utf-8">
+    <meta charset="UTF-8">
+    <title>ML Prediction Dashboard</title>
+    <link rel="stylesheet" href="/static/styles.css">
+    <style>
+        body { font-family: Arial, sans-serif; padding: 2rem; background: #f9f9f9; }
+        h1 { color: #333; }
+        form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 800px; }
+        label { font-weight: bold; }
+        input[type="number"] { padding: 0.5rem; width: 100%; border: 1px solid #ccc; border-radius: 4px; }
+        button { grid-column: span 2; padding: 0.7rem; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
+        button:hover { background-color: #45a049; }
+        pre { background: #fff; padding: 1rem; border-radius: 5px; border: 1px solid #ddd; margin-top: 1rem; white-space: pre-wrap; }
+    </style>
 </head>
 <body>
-<h2>House Price Prediction</h2>
+    <h1>ML Prediction Dashboard</h1>
 
-<form id="predict-form">
-    <textarea id="features" rows="18" cols="50">
-{
-  "bedrooms": 3,
-  "bathrooms": 2,
-  "sqft_living": 1800,
-  "sqft_lot": 5000,
-  "floors": 1,
-  "waterfront": 0,
-  "view": 0,
-  "condition": 3,
-  "grade": 7,
-  "sqft_above": 1800,
-  "sqft_basement": 0,
-  "yr_built": 1995,
-  "yr_renovated": 0,
-  "zipcode": 98178,
-  "lat": 47.51,
-  "long": -122.25,
-  "sqft_living15": 1800,
-  "sqft_lot15": 5000
-}
-    </textarea><br><br>
+    <form id="predictionForm">
+        <!-- Inputs will be inserted here dynamically -->
+    </form>
 
-    <button type="submit">Predict</button>
-</form>
+    <pre id="result">Prediction: </pre>
 
-<h3>Result</h3>
-<pre id="result"></pre>
+   <script>
+       // Use the actual dataset feature names (exclude target 'price', 'id', 'date')
+       const featureNames = [
+           "bathrooms", "bedrooms", "sqft_living", "sqft_lot", "floors",
+           "waterfront", "view", "condition", "grade", "sqft_above",
+           "sqft_basement", "yr_built", "yr_renovated", "zipcode", "lat",
+           "long", "sqft_living15", "sqft_lot15"
+       ];
+   
+       const form = document.getElementById("predictionForm");
+   
+       featureNames.forEach(f => {
+           const label = document.createElement("label");
+           label.innerText = f;
+           label.htmlFor = f;
+   
+           const input = document.createElement("input");
+           input.type = "number";
+           input.step = "any";
+           input.id = f;
+           input.name = f;
+           input.required = true;
+   
+           form.appendChild(label);
+           form.appendChild(input);
+       });
+   
+       const btn = document.createElement("button");
+       btn.type = "submit";
+       btn.innerText = "Predict";
+       form.appendChild(btn);
+   
+       form.addEventListener("submit", async (e) => {
+           e.preventDefault();
+   
+           const features = {};
+           featureNames.forEach(f => {
+               features[f] = parseFloat(document.getElementById(f).value);
+           });
+   
+           const response = await fetch("/api/predict", {
+               method: "POST",
+               headers: { "Content-Type": "application/json" },
+               body: JSON.stringify({ features })
+           });
+   
+           const data = await response.json();
+   
+           if (!response.ok) {
+               document.getElementById("result").textContent =
+                   "Error: " + JSON.stringify(data, null, 2);
+               return;
+           }
+   
+           document.getElementById("result").textContent =
+               "Prediction: " + data.prediction + "\nModel: " + data.model_version;
+       });
+   </script>
 
-<script>
-document.getElementById("predict-form").addEventListener("submit", async function(e) {
-    e.preventDefault();
-
-    const features = JSON.parse(document.getElementById("features").value);
-
-    const response = await fetch("/api/predict", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({ features })
-    });
-
-    const data = await response.json();
-    
-    if (!response.ok) {
-        document.getElementById("result").textContent =
-            "Error: " + JSON.stringify(data, null, 2);
-        return;
-    }
-    
-    document.getElementById("result").textContent =
-        "Prediction: " + data.prediction + "\nModel: " + data.model_version;
-    
-});
-</script>
 </body>
 </html>
