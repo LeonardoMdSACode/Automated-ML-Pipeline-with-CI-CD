@@ -1,16 +1,16 @@
 {
-  "timestamp": "2026-01-22T15:04:34.533337Z",
-  "candidate_model": "model_v003",
-  "baseline_model": "model_v003",
+  "timestamp": "2026-01-23T13:14:26.551910Z",
+  "candidate_model": "model_v006",
+  "baseline_model": "model_v006",
   "metrics": {
     "rmse": {
-      "candidate": 156466.1149480173,
-      "baseline": 156466.1149480173,
+      "candidate": 156466.11494801732,
+      "baseline": 156466.11494801732,
       "delta": 0.0
     },
     "r2": {
-      "candidate": 0.8380594156239445,
-      "baseline": 0.8380594156239445,
+      "candidate": 0.8380594156239444,
+      "baseline": 0.8380594156239444,
       "delta": 0.0
     }
   },

@@ -50,8 +50,16 @@ document.getElementById("predict-form").addEventListener("submit", async functio
     });
 
     const data = await response.json();
+    
+    if (!response.ok) {
+        document.getElementById("result").textContent =
+            "Error: " + JSON.stringify(data, null, 2);
+        return;
+    }
+    
     document.getElementById("result").textContent =
         "Prediction: " + data.prediction + "\nModel: " + data.model_version;
+    
 });
 </script>
 </body>
