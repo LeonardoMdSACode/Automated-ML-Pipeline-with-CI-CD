@@ -13,60 +13,96 @@ if str(ROOT) not in sys.path:
 
 from scripts.config import EVAL_DIR, BASELINE_METRICS, COMPARISON_FILE
 
-# --- Load evaluations ---
+# -------------------------------
+# Load all candidate evaluations
+# -------------------------------
 eval_files = list(EVAL_DIR.glob("*.json"))
 if not eval_files:
     raise FileNotFoundError("No evaluation files found in reports/evaluations/")
 
-all_evals = []
+evaluations = []
 for f in eval_files:
     with open(f) as j:
-        all_evals.append(json.load(j))
+        evaluations.append(json.load(j))
 
-# Latest by version
-latest = max(all_evals, key=lambda x: x["model_version"])
+# Candidate = latest model version
+candidate = max(evaluations, key=lambda x: x["model_version"])
 
-# Baseline logic
+CI_MODE = os.getenv("CI", "false").lower() == "true"
+
+# -------------------------------
+# Load baseline if exists
+# -------------------------------
 if BASELINE_METRICS.exists():
     with open(BASELINE_METRICS) as f:
         baseline = json.load(f)
 else:
-    baseline_candidates = [
-        e for e in all_evals if e["model_version"] != latest["model_version"]
-    ]
-    baseline = latest if not baseline_candidates else min(
-        baseline_candidates, key=lambda x: (x["rmse"], -x["r2"])
+    baseline = None
+
+# -------------------------------
+# FIRST RUN: bootstrap baseline
+# -------------------------------
+if baseline is None:
+    comparison = {
+        "timestamp": datetime.utcnow().isoformat() + "Z",
+        "candidate_model": candidate["model_version"],
+        "baseline_model": None,
+        "metrics": {},
+        "passed_gate": True,
+        "decision": "bootstrap",
+    }
+
+    BASELINE_METRICS.parent.mkdir(parents=True, exist_ok=True)
+    COMPARISON_FILE.parent.mkdir(parents=True, exist_ok=True)
+
+    # Baseline is only set here during bootstrap
+    with open(BASELINE_METRICS, "w") as f:
+        json.dump(candidate, f, indent=2)
+
+    with open(COMPARISON_FILE, "w") as f:
+        json.dump(comparison, f, indent=2)
+
+    print("NO BASELINE FOUND — bootstrap gate passed")
+    sys.exit(0)
+
+# -------------------------------
+# Prevent self-comparison if not CI bootstrap
+# -------------------------------
+if candidate["model_version"] == baseline["model_version"] and not CI_MODE:
+    raise RuntimeError(
+        f"INVALID STATE: candidate model ({candidate['model_version']}) "
+        f"is identical to pre-existing baseline model"
     )
 
-print(f"Comparing latest ({latest['model_version']}) vs baseline ({baseline['model_version']})")
+print(f"Comparing candidate ({candidate['model_version']}) vs baseline ({baseline['model_version']})")
 
-# --- Quality gate ---
-def gate_passed(latest_metrics, baseline_metrics):
-    if latest_metrics["rmse"] > baseline_metrics["rmse"]:
-        return False
-    if latest_metrics["r2"] < baseline_metrics["r2"]:
-        return False
-    return True
+# -------------------------------
+# Quality gate
+# -------------------------------
+def gate_passed(c, b):
+    return c["rmse"] <= b["rmse"] and c["r2"] >= b["r2"]
 
-passed = gate_passed(latest, baseline)
+passed = gate_passed(candidate, baseline)
 
-# --- Write comparison artifact (ALWAYS) ---
+# -------------------------------
+# Write comparison artifact
+# -------------------------------
 COMPARISON_FILE.parent.mkdir(parents=True, exist_ok=True)
 
 comparison = {
     "timestamp": datetime.utcnow().isoformat() + "Z",
-    "candidate_model": latest["model_version"],
+    "candidate_model": candidate["model_version"],
     "baseline_model": baseline["model_version"],
     "metrics": {
         "rmse": {
-            "candidate": latest["rmse"],
+            "candidate": candidate["rmse"],
             "baseline": baseline["rmse"],
-            "delta": latest["rmse"] - baseline["rmse"],
+            "delta": candidate["rmse"] - baseline["rmse"],
         },
         "r2": {
-            "candidate": latest["r2"],
+            "candidate": candidate["r2"],
             "baseline": baseline["r2"],
-            "delta": latest["r2"] - baseline["r2"],
+            "delta": candidate["r2"] - baseline["r2"],
         },
     },
     "passed_gate": passed,
@@ -76,12 +112,17 @@ comparison = {
 with open(COMPARISON_FILE, "w") as f:
     json.dump(comparison, f, indent=2)
 
-# --- Exit semantics ---
-CI_MODE = os.getenv("CI", "false").lower() == "true"
-
+# -------------------------------
+# Update baseline only if candidate passes gate
+# -------------------------------
 if passed:
-    print("QUALITY GATE PASSED")
-    sys.exit(0)
+    with open(BASELINE_METRICS, "w") as f:
+        json.dump(candidate, f, indent=2)
+    print("QUALITY GATE PASSED — baseline updated")
 else:
-    print("QUALITY GATE FAILED")
-    sys.exit(0 if CI_MODE else 1)
+    print("QUALITY GATE FAILED — baseline unchanged")
+
+# -------------------------------
+# Exit semantics
+# -------------------------------
+sys.exit(0 if passed or CI_MODE else 1)

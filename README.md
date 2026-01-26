@@ -23,6 +23,8 @@ python -m pip install --upgrade pip
 
 pip install -r requirements-dev.txt
 
+uvicorn app.main:app --reload
+
 # Repo Structure (Initial)
 
 ```text

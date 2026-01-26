@@ -27,11 +27,19 @@
    <script>
        // Use the actual dataset feature names (exclude target 'price', 'id', 'date')
        const featureNames = [
-           "bathrooms", "bedrooms", "sqft_living", "sqft_lot", "floors",
+           "bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors",
            "waterfront", "view", "condition", "grade", "sqft_above",
            "sqft_basement", "yr_built", "yr_renovated", "zipcode", "lat",
            "long", "sqft_living15", "sqft_lot15"
        ];
+
+       // Default values to pre-fill the inputs
+       const defaultValues = {
+           "bedrooms": 3, "bathrooms": 2, "sqft_living": 1800, "sqft_lot": 5000, "floors": 1,
+           "waterfront": 0, "view": 0, "condition": 3, "grade": 7, "sqft_above": 1800,
+           "sqft_basement": 0, "yr_built": 1995, "yr_renovated": 0, "zipcode": 98178,
+           "lat": 47.51, "long": -122.25, "sqft_living15": 1800, "sqft_lot15": 5000
+       };
    
        const form = document.getElementById("predictionForm");
    
@@ -46,6 +54,9 @@
            input.id = f;
            input.name = f;
            input.required = true;
+
+           // Set default value
+           input.value = defaultValues[f];
    
            form.appendChild(label);
            form.appendChild(input);
@@ -79,7 +90,8 @@
            }
    
            document.getElementById("result").textContent =
-               "Prediction: " + data.prediction + "\nModel: " + data.model_version;
+                   "Prediction: " + data.prediction.toFixed(2) + " $" +
+                   "\nModel: " + data.model_version;
        });
    </script>
 

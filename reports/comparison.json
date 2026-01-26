@@ -1,7 +1,7 @@
 {
-  "timestamp": "2026-01-23T13:14:26.551910Z",
-  "candidate_model": "model_v006",
-  "baseline_model": "model_v006",
+  "timestamp": "2026-01-26T13:38:42.127321Z",
+  "candidate_model": "model_v012",
+  "baseline_model": "model_v011",
   "metrics": {
     "rmse": {
       "candidate": 156466.11494801732,
