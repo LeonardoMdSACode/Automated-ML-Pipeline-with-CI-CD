@@ -9,6 +9,7 @@ from contextlib import asynccontextmanager
 
 logger = setup_logging()
 
+
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
@@ -24,6 +25,7 @@ templates = Jinja2Templates(directory="app/templates")
 app.mount("/static", StaticFiles(directory="app/static"), name="static")
 
 app.include_router(api_router, prefix="/api")
+
 
 @app.get("/")
 def home(request: Request):

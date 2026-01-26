@@ -46,6 +46,7 @@ def test_compare_fails_when_candidate_equals_baseline(tmp_path):
     env = {
         **dict(os.environ),
         "PYTHONPATH": str(PROJECT_ROOT),
+        "CI": "false",  # force non-CI mode
     }
 
     result = subprocess.run(

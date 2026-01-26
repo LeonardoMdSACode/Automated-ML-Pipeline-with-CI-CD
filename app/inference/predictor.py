@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 import joblib
 import pandas as pd
-from app.core.config import LATEST_JSON, PACKAGED_JSON
+from app.core.config import PACKAGED_JSON
 
 # Define the exact feature order used during training
 FEATURE_ORDER = [
@@ -12,6 +12,7 @@ FEATURE_ORDER = [
     "sqft_basement", "yr_built", "yr_renovated", "zipcode", "lat",
     "long", "sqft_living15", "sqft_lot15"
 ]
+
 
 class Predictor:
     def __init__(self):
@@ -32,4 +33,3 @@ class Predictor:
         # Ensure features are in correct order
         X_df = pd.DataFrame([features])[FEATURE_ORDER]
         return float(self.model.predict(X_df)[0])
-    
