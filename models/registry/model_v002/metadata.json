@@ -4,8 +4,8 @@
   "n_features": 18,
   "model_type": "RandomForestRegressor",
   "metrics": {
-    "r2": 0.8380594156239445,
+    "r2": 0.8380594156239444,
     "mae": 79874.49382189297
   },
-  "created_at": "2026-01-22T15:03:29.971316Z"
+  "created_at": "2026-01-26T15:28:04.441505Z"
 }
