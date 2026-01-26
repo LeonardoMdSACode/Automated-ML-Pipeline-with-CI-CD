@@ -10,6 +10,7 @@ ENV = os.getenv("APP_ENV", "local")
 MODELS_DIR = ROOT / "models"
 REGISTRY_DIR = MODELS_DIR / "registry"
 LATEST_JSON = REGISTRY_DIR / "latest.json"
+PACKAGED_JSON = ROOT / "models" / "packaged" / "packaged.json"
 
 # API settings
 APP_NAME = "Automated ML Pipeline Inference API"

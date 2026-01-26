@@ -3,7 +3,7 @@ from pathlib import Path
 import json
 import joblib
 import pandas as pd
-from app.core.config import LATEST_JSON
+from app.core.config import LATEST_JSON, PACKAGED_JSON
 
 # Define the exact feature order used during training
 FEATURE_ORDER = [
@@ -15,25 +15,21 @@ FEATURE_ORDER = [
 
 class Predictor:
     def __init__(self):
-        self.latest_model_info = self._load_latest()
-        self.model_version = self.latest_model_info["latest_version"]
+        # Load packaged model info
+        self.packaged_info = self._load_packaged()
+        self.model_version = self.packaged_info["model_version"]
         self.model = self._load_model()
 
-    def _load_latest(self):
-        with open(LATEST_JSON) as f:
+    def _load_packaged(self):
+        with open(PACKAGED_JSON) as f:
             return json.load(f)
 
     def _load_model(self):
-        model_path = (
-            Path("models")
-            / "registry"
-            / self.model_version
-            / "model.pkl"
-        )
+        model_path = Path("models") / "packaged" / "model.pkl"
         return joblib.load(model_path)
 
     def predict(self, features: dict):
-        # Fill missing features with 0
-        X_df = pd.DataFrame([{f: features.get(f, 0) for f in FEATURE_ORDER}])
+        # Ensure features are in correct order
+        X_df = pd.DataFrame([features])[FEATURE_ORDER]
         return float(self.model.predict(X_df)[0])
-
+    
