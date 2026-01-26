@@ -2,30 +2,83 @@
 <html lang="en">
 <head>
     <meta charset="UTF-8">
-    <title>ML Prediction Dashboard</title>
+    <title>Automated ML Prediction Dashboard</title>
     <link rel="stylesheet" href="/static/styles.css">
     <style>
-        body { font-family: Arial, sans-serif; padding: 2rem; background: #f9f9f9; }
-        h1 { color: #333; }
-        form { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; max-width: 800px; }
-        label { font-weight: bold; }
-        input[type="number"] { padding: 0.5rem; width: 100%; border: 1px solid #ccc; border-radius: 4px; }
-        button { grid-column: span 2; padding: 0.7rem; background-color: #4CAF50; color: white; border: none; border-radius: 5px; cursor: pointer; font-size: 1rem; }
-        button:hover { background-color: #45a049; }
-        pre { background: #fff; padding: 1rem; border-radius: 5px; border: 1px solid #ddd; margin-top: 1rem; white-space: pre-wrap; }
+        body { 
+            font-family: Arial, sans-serif; 
+            padding: 2rem; 
+            background: #f9f9f9; 
+        }
+        h1 { 
+            color: #333; 
+        }
+        h2 { 
+            color: #666; 
+            font-weight: normal; 
+            margin-top: 0.5rem; 
+        }
+        form { 
+            display: grid; 
+            grid-template-columns: 1fr 1fr; 
+            gap: 1rem; 
+            max-width: 800px; 
+            width: 100%; 
+            margin-top: 1.5rem;
+        }
+        label { 
+            font-weight: bold; 
+        }
+        input[type="number"] { 
+            padding: 0.5rem; 
+            width: 100%; 
+            border: 1px solid #ccc; 
+            border-radius: 4px; 
+        }
+        button { 
+            grid-column: span 2; 
+            padding: 0.7rem; 
+            background-color: #4CAF50; 
+            color: white; 
+            border: none; 
+            border-radius: 5px; 
+            cursor: pointer; 
+            font-size: 1rem; 
+        }
+        button:hover { 
+            background-color: #45a049; 
+        }
+        pre { 
+            background: #fff; 
+            padding: 1rem; 
+            border-radius: 5px; 
+            border: 1px solid #ddd; 
+            margin-top: 1rem; 
+            white-space: pre-wrap; 
+            width: 800px; 
+            text-align: center;
+        }
+        /* Center everything in the page */
+        .container { 
+            display: flex; 
+            flex-direction: column; 
+            align-items: center; 
+        }
     </style>
 </head>
 <body>
-    <h1>ML Prediction Dashboard</h1>
+    <div class="container">
+        <h1>Automated ML Prediction Dashboard</h1>
+        <h2>House Price Prediction in King County, USA</h2>
 
-    <form id="predictionForm">
-        <!-- Inputs will be inserted here dynamically -->
-    </form>
+        <form id="predictionForm">
+            <!-- Inputs will be inserted here dynamically -->
+        </form>
 
-    <pre id="result">Prediction: </pre>
+        <pre id="result">Prediction: </pre>
+    </div>
 
    <script>
-       // Use the actual dataset feature names (exclude target 'price', 'id', 'date')
        const featureNames = [
            "bedrooms", "bathrooms", "sqft_living", "sqft_lot", "floors",
            "waterfront", "view", "condition", "grade", "sqft_above",
@@ -33,7 +86,6 @@
            "long", "sqft_living15", "sqft_lot15"
        ];
 
-       // Default values to pre-fill the inputs
        const defaultValues = {
            "bedrooms": 3, "bathrooms": 2, "sqft_living": 1800, "sqft_lot": 5000, "floors": 1,
            "waterfront": 0, "view": 0, "condition": 3, "grade": 7, "sqft_above": 1800,
@@ -54,9 +106,7 @@
            input.id = f;
            input.name = f;
            input.required = true;
-
-           // Set default value
-           input.value = defaultValues[f];
+           input.value = defaultValues[f]; // Set default value
    
            form.appendChild(label);
            form.appendChild(input);
