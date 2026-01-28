@@ -8,7 +8,11 @@ predictor = Predictor()
 
 @router.post("/predict")
 def predict(payload: dict):
-    return {"prediction": predictor.predict(payload)}
+    prediction = predictor.predict(payload)
+    return {
+        "prediction": prediction,
+        "model_version": predictor.model_version
+    }
 
 @router.get("/health")
 def health():
