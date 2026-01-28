@@ -6,6 +6,9 @@ from app.api.routes import router as api_router
 from app.core.config import APP_NAME, APP_VERSION
 from app.core.logging import setup_logging
 from contextlib import asynccontextmanager
+from pathlib import Path
+import subprocess
+import sys
 
 logger = setup_logging()
 
@@ -13,6 +16,16 @@ logger = setup_logging()
 @asynccontextmanager
 async def lifespan(app: FastAPI):
     setup_logging()
+
+    packaged_model = Path("models/packaged/model.pkl")
+
+    if not packaged_model.exists():
+        print("No packaged model found. Running training pipeline...")
+
+        subprocess.check_call([sys.executable, "scripts/train.py"])
+        subprocess.check_call([sys.executable, "scripts/evaluate.py"])
+        subprocess.check_call([sys.executable, "scripts/package_model.py"])
+
     yield
 
 app = FastAPI(

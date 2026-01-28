@@ -16,20 +16,25 @@ FEATURE_ORDER = [
 
 class Predictor:
     def __init__(self):
-        # Load packaged model info
-        self.packaged_info = self._load_packaged()
-        self.model_version = self.packaged_info["model_version"]
-        self.model = self._load_model()
+        self.model = None
+        self.model_version = None
 
-    def _load_packaged(self):
+    def load(self):
+        model_path = Path("models/packaged/model.pkl")
+        if not model_path.exists():
+            raise RuntimeError(
+                "No packaged model found. Run training + packaging first."
+            )
+
         with open(PACKAGED_JSON) as f:
-            return json.load(f)
+            info = json.load(f)
 
-    def _load_model(self):
-        model_path = Path("models") / "packaged" / "model.pkl"
-        return joblib.load(model_path)
+        self.model_version = info["model_version"]
+        self.model = joblib.load(model_path)
 
     def predict(self, features: dict):
-        # Ensure features are in correct order
+        if self.model is None:
+            self.load()
+
         X_df = pd.DataFrame([features])[FEATURE_ORDER]
         return float(self.model.predict(X_df)[0])

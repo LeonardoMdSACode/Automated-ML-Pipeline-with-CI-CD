@@ -6,7 +6,13 @@ from app.inference.predictor import Predictor
 router = APIRouter()
 predictor = Predictor()
 
-@router.post("/predict", response_model=PredictionResponse)
-def predict_endpoint(request: PredictionRequest):
-    pred = predictor.predict(request.features)
-    return PredictionResponse(prediction=pred, model_version=predictor.model_version)
+@router.post("/predict")
+def predict(payload: dict):
+    return {"prediction": predictor.predict(payload)}
+
+@router.get("/health")
+def health():
+    model_exists = (Path("models/packaged/model.pkl")).exists()
+    return {
+        "model_loaded": model_exists
+    }

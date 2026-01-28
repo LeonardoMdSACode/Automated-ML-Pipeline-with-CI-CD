@@ -19,3 +19,7 @@ env/
 # Secrets & configs
 .env
 .env.*
+
+# Binaries
+*.npz
+*.pkl
