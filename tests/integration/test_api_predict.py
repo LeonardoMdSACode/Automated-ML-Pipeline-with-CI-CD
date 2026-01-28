@@ -9,7 +9,6 @@ def test_predict_endpoint_happy_path():
     client = TestClient(app)
 
     payload = {
-      "features": {
         "bedrooms": 3,
         "bathrooms": 2,
         "sqft_living": 1800,
@@ -27,14 +26,12 @@ def test_predict_endpoint_happy_path():
         "lat": 47.51,
         "long": -122.25,
         "sqft_living15": 1800,
-        "sqft_lot15": 5000
+        "sqft_lot15": 5000,
     }
-}
 
     response = client.post("/api/predict", json=payload)
     assert response.status_code == 200, response.text
-    
+
     data = response.json()
     assert "prediction" in data
     assert "model_version" in data
-
