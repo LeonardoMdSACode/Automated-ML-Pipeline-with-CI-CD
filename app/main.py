@@ -18,15 +18,11 @@ async def lifespan(app: FastAPI):
     setup_logging()
 
     packaged_model = Path("models/packaged/model.pkl")
-
     if not packaged_model.exists():
-        print("No packaged model found. Running training pipeline...")
-
-        for i in range(3):
-            subprocess.check_call([sys.executable, "scripts/train.py"])
-            subprocess.check_call([sys.executable, "scripts/evaluate.py"])
-
-        subprocess.check_call([sys.executable, "scripts/package_model.py"])
+        logger.warning(
+            "No packaged model found. Please run scripts/bootstrap.py "
+            "API will start but prediction endpoints will be unavailable."
+        )
 
     yield
 
