@@ -22,8 +22,10 @@ async def lifespan(app: FastAPI):
     if not packaged_model.exists():
         print("No packaged model found. Running training pipeline...")
 
-        subprocess.check_call([sys.executable, "scripts/train.py"])
-        subprocess.check_call([sys.executable, "scripts/evaluate.py"])
+        for i in range(3):
+            subprocess.check_call([sys.executable, "scripts/train.py"])
+            subprocess.check_call([sys.executable, "scripts/evaluate.py"])
+
         subprocess.check_call([sys.executable, "scripts/package_model.py"])
 
     yield
