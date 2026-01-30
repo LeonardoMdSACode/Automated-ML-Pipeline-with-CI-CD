@@ -42,11 +42,11 @@ jobs:
       - name: Evaluation
         run: python scripts/evaluate.py
 
-      - name: Run integration tests
-        run: python -m pytest -m integration
-
       - name: Quality gate
         run: python scripts/compare.py
 
       - name: Package model
         run: python scripts/package_model.py
+
+      - name: Run integration tests
+        run: python -m pytest -m integration

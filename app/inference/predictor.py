@@ -21,13 +21,26 @@ class Predictor:
 
     def load(self):
         model_path = Path("models/packaged/model.pkl")
+
         if not model_path.exists():
             raise RuntimeError(
-                "No packaged model found. Run training + packaging first."
+                "Packaged model not found at models/packaged/model.pkl. "
+                "Ensure CI runs `package_model.py` before integration tests."
+            )
+
+        if not PACKAGED_JSON.exists():
+            raise RuntimeError(
+                f"Packaged metadata file missing at {PACKAGED_JSON}. "
+                "Model packaging is incomplete or corrupted."
             )
 
         with open(PACKAGED_JSON) as f:
             info = json.load(f)
+
+        if "model_version" not in info:
+            raise RuntimeError(
+                "Invalid packaged metadata: missing `model_version` field."
+            )
 
         self.model_version = info["model_version"]
         self.model = joblib.load(model_path)
@@ -36,5 +49,6 @@ class Predictor:
         if self.model is None:
             self.load()
 
+        # Enforce feature order strictly
         X_df = pd.DataFrame([features])[FEATURE_ORDER]
         return float(self.model.predict(X_df)[0])
