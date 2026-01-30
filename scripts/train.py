@@ -43,8 +43,17 @@ METADATA_PATH = MODEL_DIR / "metadata.json"
 
 # Load dataset
 df = pd.read_csv(RAW_DATA)
-X = df.drop(columns=["price", "id", "date"])
-y = df["price"]
+
+TARGET = "price"
+OPTIONAL_DROP = ["id", "date"]
+
+if TARGET not in df.columns:
+    raise ValueError("Target column 'price' not found in dataset")
+
+cols_to_drop = [TARGET] + [c for c in OPTIONAL_DROP if c in df.columns]
+
+X = df.drop(columns=cols_to_drop)
+y = df[TARGET]
 
 # Split data deterministically
 X_train, X_test, y_train, y_test = train_test_split(
